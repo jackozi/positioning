@@ -18,7 +18,7 @@ module Positioning
         @positioning_columns ||= {}
       end
 
-      def positioned(on: [], column: :position)
+      def positioned(on: [], column: :position, touch: false)
         unless base_class?
           raise Error.new "can't be called on an abstract class or STI subclass."
         end
@@ -43,17 +43,17 @@ module Positioning
             end
           end
 
-          define_method(:"prior_#{column}") { Mechanisms.new(self, column).prior }
-          define_method(:"subsequent_#{column}") { Mechanisms.new(self, column).subsequent }
+          define_method(:"prior_#{column}") { Mechanisms.new(self, column, touch).prior }
+          define_method(:"subsequent_#{column}") { Mechanisms.new(self, column, touch).subsequent }
 
           redefine_method(:"#{column}=") do |position|
             send :"#{column}_will_change!"
             super(position)
           end
 
-          before_create { Mechanisms.new(self, column).create_position }
-          before_update { Mechanisms.new(self, column).update_position }
-          before_destroy { Mechanisms.new(self, column).destroy_position }
+          before_create { Mechanisms.new(self, column, touch).create_position }
+          before_update { Mechanisms.new(self, column, touch).update_position }
+          before_destroy { Mechanisms.new(self, column, touch).destroy_position }
 
           define_singleton_method(:"heal_#{column}_column!") do |order = column|
             Healer.new(self, column, order).heal
