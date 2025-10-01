@@ -107,20 +107,20 @@ module Positioning
     end
 
     def expand(scope, range)
-      scope.where(@column => range).update_all "#{quoted_column} = #{quoted_column} * -1"
+      records = scope.where(@column => range)
+      records.update_all "#{quoted_column} = #{quoted_column} * -1"
       scope.where(@column => ..-1).update_all "#{quoted_column} = #{quoted_column} * -1 + 1"
       if @touch
-        scope.where(@column => range).find_each { it.touch }
-        scope.where(@column => ..-1).find_each { it.touch }
+        records.find_each { it.touch }
       end
     end
 
     def contract(scope, range)
-      scope.where(@column => range).update_all "#{quoted_column} = #{quoted_column} * -1"
+      records = scope.where(@column => range)
+      records.update_all "#{quoted_column} = #{quoted_column} * -1"
       scope.where(@column => ..-1).update_all "#{quoted_column} = #{quoted_column} * -1 - 1"
       if @touch
-        scope.where(@column => range).find_each { it.touch }
-        scope.where(@column => ..-1).find_each { it.touch }
+        records.find_each { it.touch }
       end
     end
 
