@@ -110,8 +110,8 @@ module Positioning
       scope.where(@column => range).update_all "#{quoted_column} = #{quoted_column} * -1"
       scope.where(@column => ..-1).update_all "#{quoted_column} = #{quoted_column} * -1 + 1"
       if @touch
-        scope.where(@column => range).touch_all
-        scope.where(@column => ..-1).touch_all
+        scope.where(@column => range).find_each { it.touch }
+        scope.where(@column => ..-1).find_each { it.touch }
       end
     end
 
@@ -119,8 +119,8 @@ module Positioning
       scope.where(@column => range).update_all "#{quoted_column} = #{quoted_column} * -1"
       scope.where(@column => ..-1).update_all "#{quoted_column} = #{quoted_column} * -1 - 1"
       if @touch
-        scope.where(@column => range).touch_all
-        scope.where(@column => ..-1).touch_all
+        scope.where(@column => range).find_each { it.touch }
+        scope.where(@column => ..-1).find_each { it.touch }
       end
     end
 
