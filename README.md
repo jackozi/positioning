@@ -89,7 +89,7 @@ belongs_to :list
 positioned on: :list
 ```
 
-you'll have a method called `heal_position_column!`. You can call this method and it will cycle through every existing scope combination in your database (every list with items in this case) and reset those items' position based on their current position order by default. You can pass in a custom order if you don't trust (or don't have) an existing order column. The custom order is passed through to the Active Record `reorder` method, so you can provide anything that that method accepts:
+you'll have a method called `heal_position_column!`. **This method is named after the column used to store position values, so if you've overridden the column name the method name changes to match** (see [below](#heal-method-naming)). You can call this method and it will cycle through every existing scope combination in your database (every list with items in this case) and reset those items' position based on their current position order by default. You can pass in a custom order if you don't trust (or don't have) an existing order column. The custom order is passed through to the Active Record `reorder` method, so you can provide anything that that method accepts:
 
 ```
 Item.heal_position_column! name: :desc
@@ -100,7 +100,9 @@ You may need to introduce your database constraints after healing your position 
 * We recommend a `null: false` constraint on the position column but if your existing column has `NULL` values, you'll need to fix those first. The heal method will heal `NULL` positions but depending on your database engine `NULL` positioned items might be placed at the start of the returned records or at the end (if positioning on the position column). Some databases allow this behaviour to be customised.
 * We also recommend a unique index on the scope columns and the position column. If you have repeated position integers per scope you'll need to use the heal method to fix these first before applying the unique index in a separate migration step.
 
-The heal method name is named after the column used to store position values. By default this is `position` but if you override it then the method name will change:
+#### Heal Method Naming
+
+The heal method name is named after the column used to store position values. By default this is `position`, so the method is `heal_position_column!`. If you override the column name then the method name changes to match. For example:
 
 ```
 positioned on: :category, column: :category_position
