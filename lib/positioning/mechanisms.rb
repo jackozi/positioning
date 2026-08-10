@@ -1,8 +1,9 @@
 module Positioning
   class Mechanisms
-    def initialize(positioned, column)
+    def initialize(positioned, column, touch)
       @positioned = positioned
       @column = column.to_sym
+      @touch = touch
     end
 
     def prior
@@ -106,13 +107,21 @@ module Positioning
     end
 
     def expand(scope, range)
-      scope.where(@column => range).update_all "#{quoted_column} = #{quoted_column} * -1"
+      records = scope.where(@column => range)
+      records.update_all "#{quoted_column} = #{quoted_column} * -1"
       scope.where(@column => ..-1).update_all "#{quoted_column} = #{quoted_column} * -1 + 1"
+      if @touch
+        records.find_each { it.touch }
+      end
     end
 
     def contract(scope, range)
-      scope.where(@column => range).update_all "#{quoted_column} = #{quoted_column} * -1"
+      records = scope.where(@column => range)
+      records.update_all "#{quoted_column} = #{quoted_column} * -1"
       scope.where(@column => ..-1).update_all "#{quoted_column} = #{quoted_column} * -1 - 1"
+      if @touch
+        records.find_each { it.touch }
+      end
     end
 
     def solidify_position
